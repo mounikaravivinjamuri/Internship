@@ -31,27 +31,25 @@ app.post("/send_data",async(req,res)=>{
         
       }
       })
-    
-      
-
-      
-      
-
-app.get("/get_data",async(req,res)=>{
-
+app.get("/get_data",async(req,res)=>{  
   try{
-    const user_data=await userData.find()
+    const user_data=await user.find()
     res.json(user_data)
   }
   catch(err){
     console.log(err.message)
   }
 })
-
 app.get("/get_data/:id",async(req,res)=>{
   try{
-      const user_data=await userData.findById(req.params.id)
-      res.json(user_data)
+      const user_data=await userData.findById(req.params.id);
+      if(!user_data){
+        return res.json({error:"user not found"})
+      }
+     return res.json({message:"user data found",
+                      username:user_data.username,
+                      email:user_data.email
+     })
   }
     catch(err){
        console.log(err.message)
@@ -60,26 +58,34 @@ app.get("/get_data/:id",async(req,res)=>{
 app.put("/update_data/:id",async(req,res)=>{
       const{username,email,password}=req.body;
       try{
-        const user=await userData.findByIdAndUpdate(req.params.id,{
+        const user=await userData.findByIdAndUpdate(req.params.id,
+        {
             username,
             email,
             password
+        })
+        if(!user){
+          return res.json({error:"user not found"})
         }
-      )
-        res.json({message:"data updated",
-                  userdata:user
+        return res.json({message:"user data updated",
+                          username:user.username,
+                          email:user.email,
+                          password:user.password
         })
       }
+      
       catch(err){
         console.log(err.message)
 
-      }
-      
+      } 
 })
 app.delete("/delete_data/:id",async(req,res)=>{
   try{
       const user_data=await userData.findByIdAndDelete(req.params.id)
-      res.json(user_data)
+        if(!user_data){
+          return res.json({error:"user not found"})
+        }
+      res.json({message:"userdata deleted successfully"})
   }
     catch(err){
        console.log(err.message)
